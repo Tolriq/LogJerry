@@ -134,7 +134,7 @@ private fun AddTextFilterView(
 private fun SelectColumnTypeView(
     columnTypeState: MutableState<ColumnType>
 ) {
-    val allowedColumnTypes = listOf(ColumnType.Log, ColumnType.Tag, ColumnType.PackageName)
+    val allowedColumnTypes = listOf(ColumnType.Log, ColumnType.Tag,  ColumnType.NoTag, ColumnType.PackageName)
     var expanded by remember { mutableStateOf(false) }
     var columnType by columnTypeState
     Box(Modifier) {

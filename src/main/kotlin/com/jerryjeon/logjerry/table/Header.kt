@@ -25,6 +25,7 @@ data class Header(
             ColumnType.PackageName -> packageName
             ColumnType.Priority -> priority
             ColumnType.Tag -> tag
+            ColumnType.NoTag -> tag
             ColumnType.Log -> log
             ColumnType.Detection -> detection
         }
@@ -40,6 +41,7 @@ data class Header(
             ColumnType.PackageName -> copy(packageName = columnInfo)
             ColumnType.Priority -> copy(priority = columnInfo)
             ColumnType.Tag -> copy(tag = columnInfo)
+            ColumnType.NoTag -> copy(tag = columnInfo)
             ColumnType.Log -> copy(log = columnInfo)
             ColumnType.Detection -> copy(detection = columnInfo)
         }

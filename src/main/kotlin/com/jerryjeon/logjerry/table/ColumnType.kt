@@ -15,6 +15,7 @@ enum class ColumnType(val text: String, val shortcut: KeyShortcut, val showDivid
     PackageName("PackageName", KeyShortcut(Key.Six, meta = true), true),
     Priority("Lev", KeyShortcut(Key.Seven, meta = true), true),
     Tag("Tag", KeyShortcut(Key.Eight, meta = true), true),
+    NoTag("NoTag", KeyShortcut(Key.AllApps, meta = true), true),
     Log("Log", KeyShortcut(Key.Nine, meta = true), false),
     Detection("", KeyShortcut(Key.Zero, meta = true), false);
 }

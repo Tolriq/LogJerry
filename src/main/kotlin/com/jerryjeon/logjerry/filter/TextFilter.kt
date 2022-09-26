@@ -11,6 +11,7 @@ data class TextFilter(
         return when (columnType) {
             ColumnType.PackageName -> text in (log.packageName ?: "")
             ColumnType.Tag -> text in log.tag
+            ColumnType.NoTag -> text !in log.tag
             ColumnType.Log -> text in log.log
             else -> throw NotImplementedError("Not supported filter : $columnType")
         }
