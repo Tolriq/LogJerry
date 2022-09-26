@@ -2,7 +2,7 @@ package com.jerryjeon.logjerry.source
 
 import com.jerryjeon.logjerry.filter.FilterManager
 import com.jerryjeon.logjerry.log.LogManager
-import com.jerryjeon.logjerry.parse.DefaultParser
+import com.jerryjeon.logjerry.parse.CustomParser
 import com.jerryjeon.logjerry.parse.ParseStatus
 import com.jerryjeon.logjerry.preferences.Preferences
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class SourceManager(private val preferences: Preferences) {
     private val sourceScope = CoroutineScope(Dispatchers.Default)
-    private val parser = DefaultParser()
+    private val parser = CustomParser()
     val sourceFlow: MutableStateFlow<Source> = MutableStateFlow(Source.None)
     val parseStatusFlow: StateFlow<ParseStatus> = sourceFlow.map {
         when (it) {
