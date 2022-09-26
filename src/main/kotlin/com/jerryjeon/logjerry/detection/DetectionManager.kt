@@ -70,7 +70,7 @@ class DetectionManager(
 
                 val jsonDetections = result.allDetections[DetectorKey.Json] ?: emptyList()
                 jsonDetectionFocus.value = jsonDetections.firstOrNull()?.let {
-                    DetectionFocus(DetectorKey.Exception, 0, null, jsonDetections)
+                    DetectionFocus(DetectorKey.Json, 0, null, jsonDetections)
                 }
             }
         }
