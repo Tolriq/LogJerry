@@ -4,41 +4,13 @@
 package com.jerryjeon.logjerry
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -46,34 +18,20 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.KeyShortcut
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogState
-import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.application
-import com.jerryjeon.logjerry.detector.DetectionFocus
-import com.jerryjeon.logjerry.detector.DetectorKey
-import com.jerryjeon.logjerry.detector.JsonDetection
-import com.jerryjeon.logjerry.detector.KeywordDetectionRequest
-import com.jerryjeon.logjerry.detector.KeywordDetectionView
+import androidx.compose.ui.window.*
+import com.jerryjeon.logjerry.detector.*
 import com.jerryjeon.logjerry.filter.PriorityFilter
 import com.jerryjeon.logjerry.filter.TextFilter
 import com.jerryjeon.logjerry.log.Log
 import com.jerryjeon.logjerry.logview.InvestigationView
 import com.jerryjeon.logjerry.parse.ParseResult
 import com.jerryjeon.logjerry.parse.ParseStatus
+import com.jerryjeon.logjerry.preferences.ColorTheme
 import com.jerryjeon.logjerry.preferences.Preferences
 import com.jerryjeon.logjerry.preferences.PreferencesView
 import com.jerryjeon.logjerry.preferences.PreferencesViewModel
@@ -82,12 +40,9 @@ import com.jerryjeon.logjerry.tab.Tab
 import com.jerryjeon.logjerry.tab.TabManager
 import com.jerryjeon.logjerry.tab.Tabs
 import com.jerryjeon.logjerry.table.Header
-import com.jerryjeon.logjerry.ui.ExceptionDetectionView
-import com.jerryjeon.logjerry.ui.JsonDetectionView
-import com.jerryjeon.logjerry.ui.LogsView
-import com.jerryjeon.logjerry.ui.PriorityFilterView
-import com.jerryjeon.logjerry.ui.TextFilterView
-import com.jerryjeon.logjerry.ui.columnCheckboxItem
+import com.jerryjeon.logjerry.ui.*
+import com.jerryjeon.logjerry.util.KeyShortcuts
+import com.jerryjeon.logjerry.util.isCtrlOrMetaPressed
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.awt.FileDialog
 import java.awt.Toolkit
@@ -235,7 +190,7 @@ private fun GettingStartedView(notStarted: ParseStatus.NotStarted, changeSource:
         modifier = Modifier.fillMaxSize().padding(50.dp)
             .onPreviewKeyEvent { keyEvent ->
                 when {
-                    keyEvent.isCtrlPressed && keyEvent.key == Key.V && keyEvent.type == KeyEventType.KeyDown -> {
+                    keyEvent.isCtrlOrMetaPressed && keyEvent.key == Key.V && keyEvent.type == KeyEventType.KeyDown -> {
                         Toolkit.getDefaultToolkit()
                             .systemClipboard
                             .getData(DataFlavor.stringFlavor)
@@ -290,7 +245,7 @@ private fun InvalidSentences(parseResult: ParseResult) {
             title = "Invalid sentences",
             state = DialogState(width = 800.dp, height = 600.dp),
             onPreviewKeyEvent = { keyEvent ->
-                if (keyEvent.isCtrlPressed && keyEvent.key == Key.W && keyEvent.type == KeyEventType.KeyDown) {
+                if (keyEvent.isCtrlOrMetaPressed && keyEvent.key == Key.W && keyEvent.type == KeyEventType.KeyDown) {
                     showInvalidSentence = false
                 }
                 false
@@ -335,8 +290,45 @@ fun HeaderDivider() {
 }
 
 @Composable
-fun MyTheme(content: @Composable () -> Unit) {
-    MaterialTheme(content = content)
+fun MyTheme(
+    preferences: Preferences,
+    content: @Composable () -> Unit
+) {
+    when (preferences.colorTheme) {
+        ColorTheme.Light -> LightTheme(preferences, content)
+        ColorTheme.Dark -> DarkTheme(preferences, content)
+        ColorTheme.System -> {
+            if (isSystemInDarkTheme()) {
+                DarkTheme(preferences, content)
+            } else {
+                LightTheme(preferences, content)
+            }
+        }
+    }
+}
+
+@Composable
+fun DarkTheme(preferences: Preferences, content: @Composable () -> Unit) {
+    MaterialTheme(
+        colors = darkColors(
+            primary = Color(0xFFCE93D8),
+            secondary = Color(0xFF81C784),
+            background = preferences.darkBackgroundColor,
+            surface = preferences.darkBackgroundColor),
+        content = content
+    )
+}
+
+@Composable
+fun LightTheme(preferences: Preferences, content: @Composable () -> Unit) {
+    MaterialTheme(
+        colors = lightColors(
+            primary = Color(0xFFCE93D8),
+            secondary = Color(0xFF81C784),
+            background = preferences.lightBackgroundColor,
+            surface = preferences.lightBackgroundColor),
+        content = content
+    )
 }
 
 fun main() = application {
@@ -352,7 +344,7 @@ fun main() = application {
         state = WindowState(width = Dp.Unspecified, height = Dp.Unspecified),
         onCloseRequest = ::exitApplication,
         onPreviewKeyEvent = { keyEvent ->
-            if (keyEvent.isCtrlPressed && keyEvent.key == Key.F && keyEvent.type == KeyEventType.KeyDown) {
+            if (keyEvent.isCtrlOrMetaPressed && keyEvent.key == Key.F && keyEvent.type == KeyEventType.KeyDown) {
                 tabManager.findShortcutPressed()
                 true
             } else {
@@ -360,24 +352,24 @@ fun main() = application {
             }
         }
     ) {
-        MyTheme {
+        MyTheme(preferences = preferences) {
             MenuBar {
                 Menu("File") {
-                    Item("New Tab", shortcut = KeyShortcut(Key.N, meta = true)) {
+                    Item("New Tab", shortcut = KeyShortcuts.newTab) {
                         tabManager.newTab()
                     }
-                    Item("Open file", shortcut = KeyShortcut(Key.O, meta = true)) {
+                    Item("Open file", shortcut = KeyShortcuts.openFile) {
                         openFileDialog {
                             tabManager.onNewFileSelected(it)
                         }
                     }
-                    Item("Previous Tab", shortcut = KeyShortcut(Key.LeftBracket, meta = true, shift = true)) {
+                    Item("Previous Tab", shortcut = KeyShortcuts.previousTab) {
                         tabManager.moveToPreviousTab()
                     }
-                    Item("Next Tab", shortcut = KeyShortcut(Key.RightBracket, meta = true, shift = true)) {
+                    Item("Next Tab", shortcut = KeyShortcuts.nextTab) {
                         tabManager.moveToNextTab()
                     }
-                    Item("Close Tab", shortcut = KeyShortcut(Key.W, meta = true)) {
+                    Item("Close Tab", shortcut = KeyShortcuts.closeTab) {
                         tabManager.closeActiveTab()
                     }
                 }
@@ -387,16 +379,21 @@ fun main() = application {
                     }
                 }
                 Menu("Preferences") {
-                    Item("preferences.Preferences", shortcut = KeyShortcut(Key.Comma, meta = true)) {
+                    Item("preferences.Preferences", shortcut = KeyShortcuts.preferences) {
                         preferenceOpen.value = true
                     }
                 }
             }
-            Column {
-                TabView(tabsState.value, tabManager::activate, tabManager::close)
-                Divider(modifier = Modifier.fillMaxWidth().height(1.dp))
-                ActiveTabView(preferences, headerState.value, tabsState.value.active)
-                PreferencesView(preferenceOpen, preferencesViewModel)
+            Surface(
+                color = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.onSurface
+            ) {
+                Column {
+                    TabView(tabsState.value, tabManager::activate, tabManager::close)
+                    Divider(modifier = Modifier.fillMaxWidth().height(1.dp))
+                    ActiveTabView(preferences, headerState.value, tabsState.value.active)
+                    PreferencesView(preferenceOpen, preferencesViewModel)
+                }
             }
         }
     }
@@ -410,7 +407,7 @@ private fun TabView(tabs: Tabs, activate: (Tab) -> Unit, close: (Tab) -> Unit) {
         tabList.forEach { tab ->
             Row(
                 modifier = Modifier
-                    .background(if (tab === activated) Color.LightGray else Color.Transparent)
+                    .background(if (tab === activated) MaterialTheme.colors.secondary else Color.Transparent)
                     .clickable { activate(tab) }
                     .padding(8.dp)
             ) {

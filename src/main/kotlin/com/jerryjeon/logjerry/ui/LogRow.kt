@@ -3,24 +3,11 @@
 package com.jerryjeon.logjerry.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Expand
@@ -33,7 +20,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
@@ -50,6 +36,7 @@ import com.jerryjeon.logjerry.table.ColumnInfo
 import com.jerryjeon.logjerry.table.ColumnType
 import com.jerryjeon.logjerry.table.Header
 import com.jerryjeon.logjerry.util.copyToClipboard
+import com.jerryjeon.logjerry.util.isCtrlOrMetaPressed
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 
@@ -96,7 +83,6 @@ fun RowScope.CellByColumnType(
         ColumnType.PackageName -> PackagerNameCell(preferences, columnInfo, log)
         ColumnType.Priority -> PriorityCell(preferences, columnInfo, log)
         ColumnType.Tag -> TagCell(preferences, columnInfo, log)
-        ColumnType.NoTag -> TagCell(preferences, columnInfo, log)
         ColumnType.Detection -> DetectionCell(columnInfo, refinedLog.detectionFinishedLog)
         ColumnType.Log -> LogCell(preferences, columnInfo, refinedLog, collapseJsonDetection, expandJsonDetection)
     }
@@ -108,7 +94,7 @@ private fun RowScope.NumberCell(preferences: Preferences, number: ColumnInfo, lo
         text = log.number.toString(),
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(number.width)
     )
@@ -120,7 +106,7 @@ private fun RowScope.DateCell(preferences: Preferences, date: ColumnInfo, log: L
         text = log.date,
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(date.width)
     )
@@ -132,7 +118,7 @@ private fun RowScope.TimeCell(preferences: Preferences, time: ColumnInfo, log: L
         text = log.time,
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(time.width)
     )
@@ -144,7 +130,7 @@ private fun RowScope.PidCell(preferences: Preferences, pid: ColumnInfo, log: Log
         text = log.pid.toString(),
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(pid.width)
     )
@@ -156,7 +142,7 @@ private fun RowScope.TidCell(preferences: Preferences, tid: ColumnInfo, log: Log
         text = log.tid.toString(),
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(tid.width)
     )
@@ -168,7 +154,7 @@ private fun RowScope.PackagerNameCell(preferences: Preferences, packageName: Col
         text = log.packageName ?: "?",
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(packageName.width)
     )
@@ -180,7 +166,7 @@ private fun RowScope.PriorityCell(preferences: Preferences, priority: ColumnInfo
         text = log.priority.text,
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(priority.width)
     )
@@ -192,7 +178,7 @@ private fun RowScope.TagCell(preferences: Preferences, tag: ColumnInfo, log: Log
         text = log.tag,
         style = MaterialTheme.typography.body2.copy(
             fontSize = preferences.fontSize,
-            color = preferences.colorByPriority.getValue(log.priority)
+            color = preferences.colorByPriority().getValue(log.priority)
         ),
         modifier = this.cellDefaultModifier(tag.width)
     )
@@ -228,7 +214,7 @@ private fun RowScope.LogCell(
                 text = logContentView.str,
                 style = MaterialTheme.typography.body2.copy(
                     fontSize = preferences.fontSize,
-                    color = preferences.colorByPriority.getValue(refinedLog.detectionFinishedLog.log.priority)
+                    color = preferences.colorByPriority().getValue(refinedLog.detectionFinishedLog.log.priority)
                 ),
                 onClick = { offset ->
                     logContentView.str.getStringAnnotations(tag = "Json", start = offset, end = offset)
@@ -246,7 +232,7 @@ private fun RowScope.LogCell(
                     text = logContentView.str,
                     style = MaterialTheme.typography.body2.copy(
                         fontSize = preferences.fontSize,
-                        color = preferences.colorByPriority.getValue(refinedLog.detectionFinishedLog.log.priority)
+                        color = preferences.colorByPriority().getValue(refinedLog.detectionFinishedLog.log.priority)
                     ),
                     modifier = Modifier.padding(end = 32.dp)
                 )
@@ -303,11 +289,11 @@ private fun JsonPrettyDialog(
             state = DialogState(width = 800.dp, height = 600.dp),
             onPreviewKeyEvent = { keyEvent ->
                 when {
-                    keyEvent.isCtrlPressed && keyEvent.key == Key.W && keyEvent.type == KeyEventType.KeyDown -> {
+                    keyEvent.isCtrlOrMetaPressed && keyEvent.key == Key.W && keyEvent.type == KeyEventType.KeyDown -> {
                         showPrettyJsonDialogState.value = null
                         true
                     }
-                    keyEvent.isCtrlPressed && keyEvent.key == Key.C && keyEvent.type == KeyEventType.KeyDown -> {
+                    keyEvent.isCtrlOrMetaPressed && keyEvent.key == Key.C && keyEvent.type == KeyEventType.KeyDown -> {
                         copyToClipboard(prettyJson)
                         true
                     }
