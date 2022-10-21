@@ -3,6 +3,7 @@
 package com.jerryjeon.logjerry.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
@@ -15,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -39,6 +42,7 @@ import com.jerryjeon.logjerry.util.copyToClipboard
 import com.jerryjeon.logjerry.util.isCtrlOrMetaPressed
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlin.math.min
 
 val json = Json { prettyPrint = true }
 
@@ -212,25 +216,40 @@ private fun RowScope.LogCell(
     SelectionContainer {
         when (logContentView) {
             is LogContentView.Simple -> {
-                ClickableText(
-                    text = logContentView.str,
-                    style = MaterialTheme.typography.body2.copy(
-                        fontSize = preferences.fontSize,
-                        color = preferences.colorByPriority()
-                            .getValue(refinedLog.detectionFinishedLog.log.priority)
-                    ),
-                    onClick = { offset ->
-                        logContentView.str.getStringAnnotations(
-                            tag = "Json",
-                            start = offset,
-                            end = offset
-                        )
-                            .firstOrNull()?.let {
-                                println("click :${it.item}")
-                                expandJsonDetection(it.item)
-                            }
+                var maxLines by remember { mutableStateOf(5) }
+                Box {
+                    ClickableText(
+                        text = logContentView.str.subSequence(
+                            0,
+                            min(
+                                logContentView.str.length,
+                                if (maxLines == 5) 1500 else Int.MAX_VALUE
+                            )
+                        ),
+                        style = MaterialTheme.typography.body2.copy(
+                            fontSize = preferences.fontSize,
+                            color = preferences.colorByPriority()
+                                .getValue(refinedLog.detectionFinishedLog.log.priority)
+                        ),
+                        maxLines = maxLines,
+                        onClick = { offset ->
+                            logContentView.str.getStringAnnotations(
+                                tag = "Json",
+                                start = offset,
+                                end = offset
+                            )
+                                .firstOrNull()?.let {
+                                    println("click :${it.item}")
+                                    expandJsonDetection(it.item)
+                                }
+                        }
+                    )
+                    if (maxLines == 5) {
+                        Box(modifier=  Modifier.matchParentSize().clickable {
+                            maxLines = Int.MAX_VALUE
+                        })
                     }
-                )
+                }
             }
             is LogContentView.Json -> {
                 val modifier =
