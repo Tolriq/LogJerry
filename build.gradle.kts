@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.7.10"
     kotlin("plugin.serialization") version "1.7.10"
-    id("org.jetbrains.compose") version "1.2.0-beta01"
+    id("org.jetbrains.compose") version "1.2.0"
     id("org.jlleitschuh.gradle.ktlint-idea") version "10.2.0"
 }
 
@@ -23,7 +23,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
-    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.2.0-beta01")
+    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.2.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
     testImplementation("io.kotest:kotest-assertions-core:5.4.1")
 }
