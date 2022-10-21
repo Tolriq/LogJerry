@@ -40,7 +40,7 @@ fun PreferencesView(
 
     if (isOpen.value) {
         Window(
-            state = WindowState(width = 1200.dp, height = 1200.dp),
+            state = WindowState(width = 900.dp, height = 900.dp),
             onCloseRequest = { isOpen.value = false },
             onPreviewKeyEvent = { keyEvent ->
                 if (keyEvent.isCtrlOrMetaPressed && keyEvent.key == Key.W && keyEvent.type == KeyEventType.KeyDown) {
