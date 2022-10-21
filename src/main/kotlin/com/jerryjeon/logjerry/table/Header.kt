@@ -54,7 +54,7 @@ data class Header(
             time = ColumnInfo(ColumnType.Time, 100, true),
             pid = ColumnInfo(ColumnType.Pid, 50, false),
             tid = ColumnInfo(ColumnType.Tid, 50, false),
-            packageName = ColumnInfo(ColumnType.PackageName, 130, true),
+            packageName = ColumnInfo(ColumnType.PackageName, 130, false),
             priority = ColumnInfo(ColumnType.Priority, 40, true),
             tag = ColumnInfo(ColumnType.Tag, 200, true),
             log = ColumnInfo(ColumnType.Log, null, true),
