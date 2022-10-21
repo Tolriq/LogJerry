@@ -83,6 +83,7 @@ fun RowScope.CellByColumnType(
         ColumnType.PackageName -> PackagerNameCell(preferences, columnInfo, log)
         ColumnType.Priority -> PriorityCell(preferences, columnInfo, log)
         ColumnType.Tag -> TagCell(preferences, columnInfo, log)
+        ColumnType.NoTag -> TagCell(preferences, columnInfo, log)
         ColumnType.Detection -> DetectionCell(columnInfo, refinedLog.detectionFinishedLog)
         ColumnType.Log -> LogCell(preferences, columnInfo, refinedLog, collapseJsonDetection, expandJsonDetection)
     }
