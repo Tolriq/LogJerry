@@ -208,47 +208,56 @@ private fun RowScope.LogCell(
     collapseJsonDetection: (JsonDetection) -> Unit,
     expandJsonDetection: (annotation: String) -> Unit,
 ) {
-    when (logContentView) {
-        is LogContentView.Simple -> {
-            ClickableText(
-                text = logContentView.str,
-                style = MaterialTheme.typography.body2.copy(
-                    fontSize = preferences.fontSize,
-                    color = preferences.colorByPriority().getValue(refinedLog.detectionFinishedLog.log.priority)
-                ),
-                onClick = { offset ->
-                    logContentView.str.getStringAnnotations(tag = "Json", start = offset, end = offset)
-                        .firstOrNull()?.let {
-                            println("click :${it.item}")
-                            expandJsonDetection(it.item)
-                        }
-                }
-            )
-        }
-        is LogContentView.Json -> {
-            val modifier = logContentView.background?.let { Modifier.background(color = it) } ?: Modifier
-            Box(modifier = modifier.padding(4.dp)) {
-                Text(
+    SelectionContainer {
+        when (logContentView) {
+            is LogContentView.Simple -> {
+                ClickableText(
                     text = logContentView.str,
                     style = MaterialTheme.typography.body2.copy(
                         fontSize = preferences.fontSize,
-                        color = preferences.colorByPriority().getValue(refinedLog.detectionFinishedLog.log.priority)
+                        color = preferences.colorByPriority()
+                            .getValue(refinedLog.detectionFinishedLog.log.priority)
                     ),
-                    modifier = Modifier.padding(end = 32.dp)
-                )
-                Row(modifier = Modifier.align(Alignment.TopEnd)) {
-                    IconButton(
-                        onClick = { copyToClipboard(logContentView.str.toString()) },
-                        modifier = Modifier.size(16.dp),
-                    ) {
-                        Icon(Icons.Default.ContentCopy, "Copy the json")
+                    onClick = { offset ->
+                        logContentView.str.getStringAnnotations(
+                            tag = "Json",
+                            start = offset,
+                            end = offset
+                        )
+                            .firstOrNull()?.let {
+                                println("click :${it.item}")
+                                expandJsonDetection(it.item)
+                            }
                     }
-                    Spacer(Modifier.width(4.dp))
-                    IconButton(
-                        onClick = { collapseJsonDetection(logContentView.jsonDetection) },
-                        modifier = Modifier.size(16.dp),
-                    ) {
-                        Icon(Icons.Default.Expand, "Collapse the json")
+                )
+            }
+            is LogContentView.Json -> {
+                val modifier =
+                    logContentView.background?.let { Modifier.background(color = it) } ?: Modifier
+                Box(modifier = modifier.padding(4.dp)) {
+                    Text(
+                        text = logContentView.str,
+                        style = MaterialTheme.typography.body2.copy(
+                            fontSize = preferences.fontSize,
+                            color = preferences.colorByPriority()
+                                .getValue(refinedLog.detectionFinishedLog.log.priority)
+                        ),
+                        modifier = Modifier.padding(end = 32.dp)
+                    )
+                    Row(modifier = Modifier.align(Alignment.TopEnd)) {
+                        IconButton(
+                            onClick = { copyToClipboard(logContentView.str.toString()) },
+                            modifier = Modifier.size(16.dp),
+                        ) {
+                            Icon(Icons.Default.ContentCopy, "Copy the json")
+                        }
+                        Spacer(Modifier.width(4.dp))
+                        IconButton(
+                            onClick = { collapseJsonDetection(logContentView.jsonDetection) },
+                            modifier = Modifier.size(16.dp),
+                        ) {
+                            Icon(Icons.Default.Expand, "Collapse the json")
+                        }
                     }
                 }
             }
